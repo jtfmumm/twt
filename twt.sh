@@ -117,12 +117,15 @@ menu()
 	echo "(a) add"
 	echo "(e) edit"
 	echo "(k) kill"
+	echo "(q) quit"
 	echo "----------------------------------"
 	read INPUT
 	if [ "$INPUT" = "a" ]; then
 		add
 	elif [ "$INPUT" = "k" ]; then
 		kil
+	elif [ "$INPUT" = "q" ]; then
+		exit 0
 	elif [ "$INPUT" = "e" ]; then
 		edit
 	else
