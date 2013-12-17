@@ -13,10 +13,37 @@ quit()
 display()
 {
 	clear
-	echo "TWEET SKETCHES"
-	echo 'select * from tweets;' > $TWTDIR/temp.sql
-	sqlite3 $TWTDIR/twt.db < temp.sql
+	if [ "$1" -eq 0 ]; then 
+		echo "TWEET SKETCHES"
+	else 
+		echo "TWEET ARCHIVE"
+	fi
+	echo "SELECT tweet FROM tweets WHERE archived = \"$1\";" > $TWTDIR/temp.sql
+	sqlite3 $TWTDIR/twt.db < $TWTDIR/temp.sql > $TWTDIR/tweets.txt
+	cat $TWTDIR/tweets.txt -n
 	rm temp.sql
+}
+
+archive()
+{
+	display 1
+	echo "------------------------------------------"
+	echo "| (d)ump to text file and delete    	   |"
+	echo "| (r)eturn to main menu                  |"
+	echo "------------------------------------------"
+	read INPUT
+	if [ "$INPUT" = "d" ]; then
+		cd -
+		echo "SELECT tweet FROM tweets WHERE archived = 1;" > temp.sql
+		sqlite3 $TWTDIR/twt.db < temp.sql >> twt-archive.txt
+		rm temp.sql
+		cd $TWTDIR
+		echo "delete from tweets where archived = 1;" > temp.sql
+		sqlite3 twt.db < temp.sql
+		rm temp.sql
+		menu
+	fi
+	menu
 }
 
 err()
@@ -52,18 +79,16 @@ add()
 
 edit()
 {
-	display
+	display 0
 	echo "Edit which tweet?"
 	read INPUT
 	if [ ! "$INPUT" ]; then
-		quit
+		menu
 	fi
-	
-	echo "select tweet from tweets where id = \"$INPUT\";" > $TWTDIR/temp.sql
-    sqlite3 $TWTDIR/twt.db < temp.sql > temp.txt
+
+	sed -n "$INPUT"p < $TWTDIR/tweets.txt > temp.txt
 	read TWEET < temp.txt
 	rm temp.txt
-	rm temp.sql
 	
 	clear
 	template
@@ -77,7 +102,26 @@ edit()
 		err edit
 	fi	
 
-	echo "update tweets set tweet = \"$NEW_TWEET\" where id = \"$INPUT\";" > temp.sql
+	echo "update tweets set tweet = \"$NEW_TWEET\" where tweet = \"$TWEET\";" > temp.sql
+	sqlite3 $TWTDIR/twt.db < temp.sql
+	rm temp.sql
+	menu	
+}
+
+move()
+{
+	display 0
+	echo "Move which tweet to archive?"
+	read INPUT
+	if [ ! "$INPUT" ]; then
+		menu
+	fi
+
+	sed -n "$INPUT"p < $TWTDIR/tweets.txt > temp.txt
+	read TWEET < temp.txt
+	rm temp.txt
+
+	echo "update tweets set archived = 1 where tweet = \"$TWEET\";" > temp.sql
 	sqlite3 $TWTDIR/twt.db < temp.sql
 	rm temp.sql
 	menu	
@@ -97,13 +141,18 @@ hlp()
 
 kil()
 {
-	display
+	display 0
 	echo "Kill which tweet?"
 	read INPUT
 	if [ ! "$INPUT" ]; then
-		quit
+		menu
 	fi
-	echo "delete from tweets where id = \"$INPUT\";" > temp.sql
+
+	sed -n "$INPUT"p < $TWTDIR/tweets.txt > temp.txt
+	read TWEET < temp.txt
+	rm temp.txt
+
+	echo "delete from tweets where tweet = \"$TWEET\";" > temp.sql
 	sqlite3 twt.db < temp.sql
 	rm temp.sql
 	menu
@@ -112,13 +161,12 @@ kil()
 menu()
 {
 	clear
-	display
-	echo "----------------------------------"
-	echo "(a) add"
-	echo "(e) edit"
-	echo "(k) kill"
-	echo "(q) quit"
-	echo "----------------------------------"
+	display 0
+	echo "----------------------------------------"
+	echo "| (a)dd new          (e)dit            |" 
+	echo "| (v)iew archive     (m)ove to archive |"
+	echo "| (k)ill (delete)    (q)uit            |" 
+	echo "----------------------------------------"
 	read INPUT
 	if [ "$INPUT" = "a" ]; then
 		add
@@ -128,6 +176,10 @@ menu()
 		exit 0
 	elif [ "$INPUT" = "e" ]; then
 		edit
+	elif [ "$INPUT" = "m" ]; then
+		move
+	elif [ "$INPUT" = "v" ]; then
+		archive
 	else
 		menu	
 	fi
@@ -136,7 +188,7 @@ menu()
 if [ "$1" = "h" ]; then
 	hlp
 elif [ "$1" = "d" ]; then
-	display
+	display 0
 elif [ "$1" = "k" ]; then
 	kil
 elif [ "$1" = "e" ]; then

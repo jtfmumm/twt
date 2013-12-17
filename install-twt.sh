@@ -13,7 +13,7 @@ mkdir ~/.twt/
 touch ~/.twt/twt.cfg
 touch ~/.twt/twt.db
 
-echo "CREATE TABLE tweets (id integer primary key autoincrement, tweet text);" > initialize_db.sql
+echo "CREATE TABLE tweets (id integer PRIMARY KEY AUTOINCREMENT, tweet text, archived integer DEFAULT 0);" > initialize_db.sql
 sqlite3 ~/.twt/twt.db < initialize_db.sql	
 rm initialize_db.sql
 
