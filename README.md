@@ -27,3 +27,11 @@ sudo ./install-twt.sh
 
 Run the program by typing
 twt  
+
+# Usage
+
+You can add tweet sketches, delete them if you judge they're below your standards,
+move them to the archive if you're sick of looking at them, and dump the archive to
+a text file in case you want to save it for posterity.  
+
+Now you can write pithy aphorisms in between command line tasks.  Don't abuse it.  
