@@ -63,7 +63,7 @@ add()
 {
 	clear
 	template
-	echo "Type in your tweet!"
+	echo "Go!"
 	read INPUT
 	echo $INPUT | wc -c > temp.txt
 	read COUNT < temp.txt
