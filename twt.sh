@@ -28,7 +28,7 @@ archive()
 {
 	display 1
 	echo "------------------------------------------"
-	echo "| (d)ump to text file and delete    	   |"
+	echo "| (d)ump to text file and delete         |"
 	echo "| (r)eturn to main menu                  |"
 	echo "------------------------------------------"
 	read INPUT
