@@ -56,7 +56,7 @@ template()
 {
 	#Displays symbols to represent max length
 	echo "Limit 144 characters:"
-	seq 76 | tr -d '\n' | sed 's/./\-/g' | sed '$a\'
+	seq 76 | tr -d '\n' | sed 's/./\-/g'
 }
 
 add()
